@@ -34,7 +34,7 @@ var ESCAPE_REPLACE = '\\$1'
  * @public
  */
 
-function vhost (hostname, handle) {
+function vhost (hostname, handle, options) {
   if (!hostname) {
     throw new TypeError('argument hostname is required')
   }
@@ -51,7 +51,7 @@ function vhost (hostname, handle) {
   var regexp = hostregexp(hostname)
 
   return function vhost (req, res, next) {
-    var vhostdata = vhostof(req, regexp)
+    var vhostdata = vhostof(req, regexp, options ? options.hostnameof : null)
 
     if (!vhostdata) {
       return next()
@@ -136,9 +136,9 @@ function hostregexp (val) {
  * @private
  */
 
-function vhostof (req, regexp) {
+function vhostof (req, regexp, opthostnameof) {
   var host = req.headers.host
-  var hostname = hostnameof(req)
+  var hostname = opthostnameof && typeof opthostnameof === 'function' ? opthostnameof(req) : hostnameof(req)
 
   if (!hostname) {
     return
